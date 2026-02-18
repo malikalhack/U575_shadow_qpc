@@ -1,0 +1,40 @@
+# Blink Task Project
+# This project tests the blink task functionality with QPC framework
+project:
+
+  # List components to use for your application.
+  # A software component is a re-usable unit that may be configurable.
+  components:
+    - component: ARM::CMSIS:CORE
+
+  # Compiler defines
+  define:
+    - STM32U575xx
+
+  processor:
+    fpu: sp
+    trustzone: non-secure
+
+  # Include paths
+  add-path:
+    - RTE/Device/STM32U575ZITxQ
+    - ../../App/Inc
+    - ../../Drivers/BSP/Inc
+    - ../../QPC/Core/Inc
+    - ../../QPC/Platform/Inc
+    - ../../QPC/Port/Inc
+    - ../../QPC/Spy/Inc
+    - ../../Generated/Inc
+
+  # List executable file formats to be generated.
+  output:
+    type:
+      - elf
+      - hex
+      - bin
+      - map
+
+  groups:
+    - group: Application
+      files:
+        - file: ../../App/Src/main.c

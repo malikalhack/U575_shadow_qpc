@@ -1,0 +1,62 @@
+# A solution is a collection of related projects that share same base configuration.
+solution:
+  created-for: CMSIS-Toolbox@2.12.0
+  cdefault: # use CMSIS-Toolbox default Compiler options
+
+  # Compilers that can be selected
+  select-compiler:
+    - compiler: AC6
+
+  # List of miscellaneous tool-specific controls
+  misc:
+    - for-compiler: AC6 # Using DWARF 4 for better GDB compatibility
+      C-CPP:
+        - -gdwarf-4
+      ASM:
+        - -gdwarf-4
+
+  # List the packs that define the device and/or board.
+  packs:
+    - pack: Keil::STM32U5xx_DFP
+    - pack: ARM::CMSIS
+
+  # List different hardware targets that are used to deploy the solution.
+  target-types:
+    - type: STM32U575ZITxQ
+      device: STM32U575ZITxQ
+      target-set:
+        - set:
+          images:
+            - project-context: shadow.Debug
+          debugger:
+            name: ST-Link@pyOCD
+            clock: 4000000
+            protocol: swd
+
+  # List of different build configurations.
+  build-types:
+    - type: Debug
+      debug: on
+      optimize: none
+      define:
+        - DEBUG
+
+    - type: Release
+      debug: off
+      misc:
+        - for-compiler: AC6
+          C-CPP:
+            - -Os
+
+    - type: Spy
+      debug: off
+      misc:
+        - for-compiler: AC6
+          C-CPP:
+            - -Os
+      define:
+        - Q_SPY
+
+  # List related projects (each test is a separate project).
+  projects:
+    - project: shadow/shadow.cproject.yml
