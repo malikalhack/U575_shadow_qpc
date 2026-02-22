@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model version="7.0.2" links="1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.state-machine.com/qm/qm7.xsd">
+ <documentation>About
+This project demonstrates a &quot;running shadow&quot; visual effect using three LEDs (red, green, and blue) on an STM32U575 microcontroller. The implementation uses the QP/C (Quantum Platform in C) real-time embedded framework.
+
+What It Does
+The program creates a cyclic lighting pattern where LEDs sequentially turn on and off, producing a &quot;chasing&quot; or &quot;running shadow&quot; effect:
+
+Initial State: All three LEDs turn on simultaneously
+Cyclic Pattern:
+Green LED on, Red LED off
+Red LED on, Blue LED off
+Blue LED on, Green LED off
+(cycle repeats)
+Visual Effect
+The &quot;running shadow&quot; effect creates the illusion of light traveling in a circle through the three LEDs. At any given moment, two LEDs are illuminated while one is dark, and this &quot;shadow&quot; appears to rotate through the sequence. The timing delay between transitions creates a smooth, continuous motion effect.
+
+Technical Details
+Platform: STM32U575ZITxQ microcontroller
+Framework: QP/C real-time framework with QXK kernel
+Build System: CMSIS-Toolbox with CMake
+State Machine Model: Designed using QM modeling tool (see running_shadow.qm)
+Flashing: PyOCD-based automated flashing tasks for rapid deployment
+This serves as a foundational proof-of-concept for RTOS-based embedded applications using the QP/C framework.</documentation>
+ <!--${qpc}-->
+ <framework name="qpc"/>
+ <!--${Shared}-->
+ <package name="Shared" stereotype="0x00">
+  <!--${Shared::BlinkySignals}-->
+  <attribute name="BlinkySignals" type="enum" visibility="0x04" properties="0x00">
+   <code>{
+    TIMEOUT_SIG = Q_USER_SIG, /* offset the first signal by Q_USER_SIG */
+    MAX_SIG /* keep last (the number of signals) */
+};</code>
+  </attribute>
+  <!--${Shared::AO_Blinky}-->
+  <attribute name="AO_Blinky" type="QActive * const" visibility="0x00" properties="0x00">
+   <code>= &amp;Blinky_inst.super;</code>
+  </attribute>
+  <!--${Shared::Blinky_ctor}-->
+  <operation name="Blinky_ctor" type="void" visibility="0x00" properties="0x01">
+   <documentation>The Blinky &quot;constructor&quot; is provided outside of the Blinky class, so that it can be used independently from the class. This is part of the &quot;opaque pointer&quot; design idiom.</documentation>
+   <code>Blinky * const me = &amp;Blinky_inst;
+QActive_ctor(&amp;me-&gt;super, Q_STATE_CAST(&amp;Blinky_initial));
+QTimeEvt_ctorX(&amp;me-&gt;timeEvt, &amp;me-&gt;super, TIMEOUT_SIG, 0U);</code>
+  </operation>
+ </package>
+ <!--${AOs}-->
+ <package name="AOs" stereotype="0x02">
+  <!--${AOs::Blinky}-->
+  <class name="Blinky" superclass="qpc::QActive">
+   <!--${AOs::Blinky::timeEvt}-->
+   <attribute name="timeEvt" type="QTimeEvt" visibility="0x02" properties="0x00"/>
+   <!--${AOs::Blinky::inst}-->
+   <attribute name="inst" type="Blinky" visibility="0x00" properties="0x01"/>
+   <!--${AOs::Blinky::SM}-->
+   <statechart properties="0x03">
+    <documentation>Blinky state machine</documentation>
+    <!--${AOs::Blinky::SM::initial}-->
+    <initial target="../1">
+     <action>Q_UNUSED_PAR(par);
+
+QTimeEvt_armX(
+    &amp;me-&gt;timeEvt,
+    BSP_TICKS_PER_SEC/2,
+    BSP_TICKS_PER_SEC/2
+);</action>
+     <initial_glyph color="3" conn="29,3,5,0,15,3">
+      <action box="0,-2,10,2"/>
+     </initial_glyph>
+    </initial>
+    <!--${AOs::Blinky::SM::ready}-->
+    <state name="ready">
+     <entry>turn_on_led_green();
+turn_on_led_blue();
+turn_on_led_red();</entry>
+     <!--${AOs::Blinky::SM::ready::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph conn="34,14,3,1,24,12,-4">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph color="3" node="34,6,20,12">
+      <entry box="0,3,6,2"/>
+     </state_glyph>
+    </state>
+    <!--${AOs::Blinky::SM::red}-->
+    <state name="red">
+     <entry>turn_off_led_red();
+turn_on_led_green();</entry>
+     <!--${AOs::Blinky::SM::red::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../3">
+      <tran_glyph color="3" conn="34,30,3,1,24,12,-4">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph color="2" node="34,22,20,12">
+      <entry box="0,3,6,2"/>
+     </state_glyph>
+    </state>
+    <!--${AOs::Blinky::SM::blue}-->
+    <state name="blue">
+     <entry>turn_off_led_blue();
+turn_on_led_red();</entry>
+     <!--${AOs::Blinky::SM::blue::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../4">
+      <tran_glyph color="3" conn="34,46,3,1,24,14,-4">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph node="34,38,20,12">
+      <entry box="0,3,6,2"/>
+     </state_glyph>
+    </state>
+    <!--${AOs::Blinky::SM::green}-->
+    <state name="green">
+     <entry>turn_off_led_green();
+turn_on_led_blue();</entry>
+     <!--${AOs::Blinky::SM::green::TIMEOUT}-->
+     <tran trig="TIMEOUT" target="../../2">
+      <tran_glyph color="3" conn="34,62,3,3,-4,-36,4">
+       <action box="0,-2,10,2"/>
+      </tran_glyph>
+     </tran>
+     <state_glyph color="1" node="34,54,20,12">
+      <entry box="0,3,6,2"/>
+     </state_glyph>
+    </state>
+    <state_diagram size="83,67"/>
+   </statechart>
+  </class>
+ </package>
+ <!--${../Generated/Src}-->
+ <directory name="../Generated/Src">
+  <!--${../Generated/Src::shadow_task.c}-->
+  <file name="shadow_task.c">
+   <text>/******************************** Included files ******************************/
+#include &quot;blinky.h&quot;
+/********************************* Definitions ********************************/
+
+Q_DEFINE_THIS_FILE
+
+enum EActorPrio{
+    eFORBIDDEN_PRIO = 0,
+    eBLINK_PRIO,
+    eACTOR_PRIO_MAX
+};
+
+/********************* Application Programming Interface *********************/
+
+void task_start(void) {
+    // instantiate and start AOs/threads...
+    static QEvt const *blinkyQueueSto[10];
+    Blinky_ctor();
+    QACTIVE_START(
+        AO_Blinky,
+        eBLINK_PRIO,           // QP prio. of the AO
+        blinkyQueueSto,        // event queue storage
+        Q_DIM(blinkyQueueSto), // queue length [events]
+        (void *)0, 0U,         // no stack storage
+        (void *)0              // no initialization param
+    );
+}
+/*****************************************************************************/</text>
+  </file>
+  <!--${../Generated/Src::blinky.c}-->
+  <file name="blinky.c">
+   <text>/******************************** Included files ******************************/
+#include &quot;bsp.h&quot;
+#include &quot;blinky.h&quot;
+/********************************* Definitions ********************************/
+
+Q_DEFINE_THIS_FILE
+
+/******************************** QP Interface *******************************/
+
+$declare ${AOs::Blinky}
+
+$define ${Shared}
+
+$define ${AOs::Blinky}
+/*****************************************************************************/</text>
+  </file>
+ </directory>
+ <!--${../Generated/Inc}-->
+ <directory name="../Generated/Inc">
+  <!--${../Generated/Inc::blinky.h}-->
+  <file name="blinky.h">
+   <text>#ifndef BLINKY_H_
+#define BLINKY_H_
+/******************************** Included files ******************************/
+#include &quot;qpc.h&quot;    // QP/C real-time embedded framework
+/********************************* Definitions ********************************/
+
+$declare ${Shared}
+
+#endif // !BLINKY_H_</text>
+  </file>
+ </directory>
+</model>

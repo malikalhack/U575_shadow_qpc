@@ -19,17 +19,40 @@
 # debug information files
 *.dwo
 
+# Clang specific
+*.ast
+*.clangd/
+*.cache/
+*.tmp
+
+# VS Code specific
+.vscode/
+.history/
+*.code-workspace
+
 # Build output
 [Oo][Uu][Tt]
+DebugConfig/
+[Rr][Tt][Ee]/
 
 # Build cache
 [Tt][Mm][Pp]/
 .ninja_log
 
-# Build logs
+# Build logs and temporary files
 qp.cbuild-idx.yml
 qp.cbuild-pack.yml
 .clangd
+# Logs 
+*.log
+*.swp
+*.swo
+*.tmp
+*.bak
+*.old
+*.qms
 
 # Debug configuration
 MDK-ARM/.cmsis/
+
+

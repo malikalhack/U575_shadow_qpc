@@ -4,8 +4,8 @@ This repository contains a simple example, **Blink**, demonstrating how to toggl
 ## Requirements
 - Supported microcontroller board is NUCLEO-U575ZI-Q
 - AC6 compiler
-- QP/C source
-- CMake/Makefile or IDE project setup
+- RTEF source
+- VS Code project setup
 
 ## Getting Started 
 
