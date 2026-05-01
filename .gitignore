@@ -53,6 +53,6 @@ qp.cbuild-pack.yml
 *.qms
 
 # Debug configuration
-MDK-ARM/.cmsis/
+Solution/.cmsis/
 
 

@@ -1,13 +1,14 @@
 /**
  * @file    main.c
- * @version 0.0.0
+ * @version 1.0.0
  * @authors Anton Chernov
- * @date    02/02/2026
+ * @date    02/06/2026
  * @date    @showdate "%m/%d/%Y"
  */
 
 /********************************* Include files ******************************/
 #include "qpc.h"
+
 /********************************* Definitions ********************************/
 
 Q_DEFINE_THIS_FILE

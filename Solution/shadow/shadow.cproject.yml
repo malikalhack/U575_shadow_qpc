@@ -12,18 +12,17 @@ project:
     - STM32U575xx
 
   processor:
-    fpu: sp
+    fpu: off
     trustzone: non-secure
 
   # Include paths
   add-path:
-    - RTE/Device/STM32U575ZITxQ
     - ../../App/Inc
-    - ../../Drivers/BSP/Inc
-    - ../../QPC/Core/Inc
-    - ../../QPC/Platform/Inc
-    - ../../QPC/Port/Inc
-    - ../../QPC/Spy/Inc
+    - ../../Bsp/Inc
+    - ../../Qpc/Core/Inc
+    - ../../Qpc/Platform/Inc
+    - ../../Qpc/Port/Inc
+    - ../../Qpc/Spy/Inc
     - ../../Generated/Inc
 
   # List executable file formats to be generated.
@@ -31,10 +30,41 @@ project:
     type:
       - elf
       - hex
-      - bin
       - map
 
   groups:
     - group: Application
       files:
         - file: ../../App/Src/main.c
+        - file: ../../App/Src/handlers.c
+    - group: BSP
+      files:
+        - file: ../../Bsp/Src/bsp.c
+        - file: ../../Bsp/Src/startup_stm32u575xx.s
+    - group: Generate
+      files:
+        - file: ../../Generated/Src/blinky.c
+        - file: ../../Generated/Src/shadow_task.c
+    - group: QP/Core
+      files:
+        - file: ../../Qpc/Core/Src/qxk.c
+        - file: ../../Qpc/Core/Src/qxk_mutex.c
+        - file: ../../Qpc/Core/Src/qxk_sema.c
+        - file: ../../Qpc/Core/Src/qxk_xthr.c
+    - group: QP/Platform
+      files:
+        - file: ../../Qpc/Platform/Src/qep_hsm.c
+        - file: ../../Qpc/Platform/Src/qep_msm.c
+        - file: ../../Qpc/Platform/Src/qf_act.c
+        - file: ../../Qpc/Platform/Src/qf_actq.c
+        - file: ../../Qpc/Platform/Src/qf_defer.c
+        - file: ../../Qpc/Platform/Src/qf_dyn.c
+        - file: ../../Qpc/Platform/Src/qf_mem.c
+        - file: ../../Qpc/Platform/Src/qf_ps.c
+        - file: ../../Qpc/Platform/Src/qf_qact.c
+        - file: ../../Qpc/Platform/Src/qf_qeq.c
+        - file: ../../Qpc/Platform/Src/qf_qmact.c
+        - file: ../../Qpc/Platform/Src/qf_time.c
+    - group: QP/Port
+      files:
+        - file: ../../Qpc/Port/Src/qxk_port.c

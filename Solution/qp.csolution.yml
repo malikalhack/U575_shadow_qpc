@@ -5,7 +5,7 @@ solution:
 
   # Compilers that can be selected
   select-compiler:
-    - compiler: AC6
+    - compiler: AC6@6.20.1
 
   # List of miscellaneous tool-specific controls
   misc:
@@ -14,10 +14,11 @@ solution:
         - -gdwarf-4
       ASM:
         - -gdwarf-4
+        - -Wa,armasm,--diag_suppress=A1950W
 
   # List the packs that define the device and/or board.
   packs:
-    - pack: Keil::STM32U5xx_DFP
+    - pack: Keil::STM32U5xx_DFP@^2.2.1
     - pack: ARM::CMSIS
 
   # List different hardware targets that are used to deploy the solution.
@@ -26,12 +27,12 @@ solution:
       device: STM32U575ZITxQ
       target-set:
         - set:
-          images:
-            - project-context: shadow.Debug
           debugger:
             name: ST-Link@pyOCD
-            clock: 4000000
+            clock: 8000000
             protocol: swd
+          images:
+            - project-context: blink_test.Debug
 
   # List of different build configurations.
   build-types:
@@ -47,16 +48,19 @@ solution:
         - for-compiler: AC6
           C-CPP:
             - -Os
-
-    - type: Spy
-      debug: off
-      misc:
-        - for-compiler: AC6
-          C-CPP:
-            - -Os
-      define:
-        - Q_SPY
+          Link:
+            - --info=sizes,totals
+    # - type: Spy
+    #   debug: off
+    #   misc:
+    #     - for-compiler: AC6
+    #       C-CPP:
+    #         - -Os
+    #   define:
+    #     - Q_SPY
+    # List related projects (each test is a separate project).
 
   # List related projects (each test is a separate project).
   projects:
     - project: shadow/shadow.cproject.yml
+  compiler: AC6
